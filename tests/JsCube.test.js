@@ -68,4 +68,9 @@ describe('CatXCatMatrix', () => {
     let matrix = new jsc.JsCube(cat_x_cat).slices[0];
     expect(matrix.rowMargin).toEqual(nj.array([7, 8]));
   });
+
+  it('calculates column proportions', () => {
+    let matrix = new jsc.JsCube(cat_x_cat).slices[0];
+    expect(matrix.columnProportions).toEqual(nj.array([[0.5, 0.5], [0.4,0.6]]));
+  });
 });

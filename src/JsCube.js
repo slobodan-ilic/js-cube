@@ -84,7 +84,11 @@ class CategoricalVector {
   }
 
   get margin() {
-	return nj.sum(this.counts);
+    return nj.sum(this.counts);
+  }
+
+  get proportions() {
+    return nj.stack(this.counts.map(count => count / this.margin));
   }
 }
 
@@ -95,21 +99,25 @@ class CatXCatMatrix {
   }
 
   get columnMargin() {
-	return nj.stack(this.columns.map(column => column.margin));
+    return nj.stack(this.columns.map(column => column.margin));
+  }
+
+  get columnProportions() {
+    return nj.stack(this.columns.map(column => column.proportions));
   }
 
   get rowMargin() {
-	return nj.stack(this.rows.map(row => row.margin));
+    return nj.stack(this.rows.map(row => row.margin));
   }
 
   get rows() {
-	let rowCounts = this.counts.tolist();
-	return rowCounts.map(counts => new CategoricalVector(counts));
+    let rowCounts = this.counts.tolist();
+    return rowCounts.map(counts => new CategoricalVector(counts));
   }
 
   get columns() {
-	let columnCounts = this.counts.T.tolist();
-	return columnCounts.map(counts => new CategoricalVector(counts));
+    let columnCounts = this.counts.T.tolist();
+    return columnCounts.map(counts => new CategoricalVector(counts));
   }
 }
 
