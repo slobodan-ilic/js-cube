@@ -37,8 +37,20 @@ class JsCube {
     this.result = response.result;
   }
 
-  get counts() {
+  get allCounts() {
     return nj.array(this.result.counts).reshape(this.shape);
+  }
+
+  get counts() {
+    let validIndices = this.dimensions.map(d => d.validIndices);
+    let counts = this.allCounts;
+
+    // Eliminate missing columns
+    counts = nj.stack(validIndices[1].map(i => counts.T.pick(i, null)));
+    // Eliminate missing rows
+    counts = nj.stack(validIndices[0].map(i => counts.T.pick(i, null)));
+
+    return counts;
   }
 
   get dimensions() {
@@ -64,8 +76,16 @@ class JsCube {
       // TODO: Index correct counts
     }
   }
-  // this.getCounts = () => {};
-  // this.counts = this.getCounts();
+}
+
+class CategoricalVector {
+  constructor(counts) {
+    this.counts = counts;
+  }
+
+  get margin() {
+	return nj.sum(this.counts);
+  }
 }
 
 class CatXCatMatrix {
@@ -75,11 +95,21 @@ class CatXCatMatrix {
   }
 
   get columnMargin() {
-    return this.getColumnMargin();
+	return nj.stack(this.columns.map(column => column.margin));
   }
 
-  getColumnMargin() {
-    let counts = this.counts;
+  get rowMargin() {
+	return nj.stack(this.rows.map(row => row.margin));
+  }
+
+  get rows() {
+	let rowCounts = this.counts.tolist();
+	return rowCounts.map(counts => new CategoricalVector(counts));
+  }
+
+  get columns() {
+	let columnCounts = this.counts.T.tolist();
+	return columnCounts.map(counts => new CategoricalVector(counts));
   }
 }
 

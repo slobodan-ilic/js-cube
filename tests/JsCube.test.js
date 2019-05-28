@@ -33,11 +33,16 @@ describe('JsCube', () => {
     expect(catXCatCube.shape).toEqual([3, 4]);
   });
 
-  it('reshapes counts', () => {
-    console.log(catXCatCube.counts);
-    expect(catXCatCube.counts).toEqual(
+  it('reshapes all counts', () => {
+    expect(catXCatCube.allCounts).toEqual(
       nj.array([[5, 3, 2, 0], [5, 2, 3, 0], [0, 0, 0, 0]]),
     );
+  });
+
+  it('indexes valid counts', () => {
+	let actual = catXCatCube.counts;
+	let expected = nj.array([[5, 2], [5, 3]]);
+    expect(actual).toEqual(expected);
   });
 });
 
@@ -53,9 +58,14 @@ describe('Dimension', () => {
   });
 });
 
-describe.skip('CatXCatMatrix', () => {
+describe('CatXCatMatrix', () => {
   it('calculates column margin', () => {
     let matrix = new jsc.JsCube(cat_x_cat).slices[0];
-    expect(matrix.columnMargin).toEqual([1, 2, 3]);
+    expect(matrix.columnMargin).toEqual(nj.array([10, 5]));
+  });
+
+  it('calculates row margin', () => {
+    let matrix = new jsc.JsCube(cat_x_cat).slices[0];
+    expect(matrix.rowMargin).toEqual(nj.array([7, 8]));
   });
 });
