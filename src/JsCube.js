@@ -1,9 +1,12 @@
 var nj = require('numjs');
 
 const dimensionTypes = Object.freeze({
-  CAT: 0,
-  MR: 1,
+  CAT: "CAT",
+  MR: "MR",
+  MR_CAT: "MR_CAT"
 });
+
+const dt = dimensionTypes
 
 class Dimension {
   constructor(dimDict) {
@@ -11,14 +14,14 @@ class Dimension {
   }
 
   get type() {
-    return this.getType();
+    return this.resolveType;
   }
 
   get elements() {
-    if (this.type === dimensionTypes.CAT) {
+    if (this.type == dt.MR_CAT || this.type == dt.CAT) {
       return this.dimDict.type.categories;
     }
-    if (this.type === dimensionTypes.MR) {
+    if (this.type === dt.MR) {
       return this.dimDict.type.elements;
     }
   }
@@ -29,19 +32,30 @@ class Dimension {
       .filter(i => i !== -1);
   }
 
-  getType() {
+  get resolveCategorical() {
+    if (this.isArrayCat) {
+      return dt.MR_CAT;
+    }
+    return dt.CAT
+  }
+
+  get isArrayCat() {
+    return Boolean(this.dimDict.references.subreferences)
+  }
+  get resolveType() {
     let dimDict = this.dimDict;
     let typeClass = dimDict.type.class;
 
     if (typeClass === 'categorical') {
-      return dimensionTypes.CAT;
+
+      return this.resolveCategorical;
     }
 
     if (typeClass === 'enum') {
       let subclass = dimDict.type.subtype.class;
       if (subclass === 'variable') {
         // TODO: Add proper array type resolution here
-        return dimensionTypes.MR;
+        return dt.MR;
       }
     }
   }
@@ -72,8 +86,12 @@ class JsCube {
     return this.result.dimensions.map(dimDict => new Dimension(dimDict));
   }
 
-  get dimensionTypes() {
+  get allDimensionTypes() {
     return this.dimensions.map(dim => dim.type);
+  }
+
+  get dimensionTypes() {
+    return this.allDimensionTypes.filter(t => t !== dt.MR_CAT)
   }
 
   get slices() {
