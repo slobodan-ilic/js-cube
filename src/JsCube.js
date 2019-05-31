@@ -14,20 +14,35 @@ class Dimension {
     return this.getType();
   }
 
-  get categories() {
-    return this.dimDict.type.categories;
+  get elements() {
+    if (this.type === dimensionTypes.CAT) {
+      return this.dimDict.type.categories;
+    }
+    if (this.type === dimensionTypes.MR) {
+      return this.dimDict.type.elements;
+    }
   }
 
   get validIndices() {
-    return this.categories
+    return this.elements
       .map((e, i) => (!e.missing ? i : -1))
       .filter(i => i !== -1);
   }
 
   getType() {
-    let typeClass = this.dimDict.type.class;
+    let dimDict = this.dimDict;
+    let typeClass = dimDict.type.class;
+
     if (typeClass === 'categorical') {
       return dimensionTypes.CAT;
+    }
+
+    if (typeClass === 'enum') {
+      let subclass = dimDict.type.subtype.class;
+      if (subclass === 'variable') {
+        // TODO: Add proper array type resolution here
+        return dimensionTypes.MR;
+      }
     }
   }
 }
@@ -66,7 +81,7 @@ class JsCube {
   }
 
   get shape() {
-    return this.dimensions.map(d => d.categories.length);
+    return this.dimensions.map(d => d.elements.length);
   }
 
   getSlices() {

@@ -1,8 +1,11 @@
 const nj = require('numjs');
 const jsc = require('../src/JsCube');
+const dt = jsc.dimensionTypes;
 const cat_x_cat = require('./fixtures/cat-x-cat.json');
+const mr_x_cat = require('./fixtures/mr-x-cat-hs.json');
 const DT = jsc.dimensionTypes;
 const catXCatCube = new jsc.JsCube(cat_x_cat);
+const mrXCatCube = new jsc.JsCube(mr_x_cat);
 
 describe('JsCube', () => {
   it('loads response JSON', () => {
@@ -22,15 +25,25 @@ describe('JsCube', () => {
     ]);
   });
 
-  it('resolves CAT x CAT types', () => {
-    expect(catXCatCube.dimensionTypes).toEqual([
-      jsc.dimensionTypes.CAT,
-      jsc.dimensionTypes.CAT,
-    ]);
+  describe('resolves cube type', () => {
+    it('to CAT x CAT', () => {
+      expect(catXCatCube.dimensionTypes).toEqual([dt.CAT, dt.CAT]);
+    });
+
+    // TODO: Add proper resolution (with mr cat hidden)
+    it('to MR x MR_CAT x CAT', () => {
+      expect(mrXCatCube.dimensionTypes).toEqual([dt.MR, dt.CAT, dt.CAT]);
+    });
   });
 
-  it('knows its shape with all elements', () => {
-    expect(catXCatCube.shape).toEqual([3, 4]);
+  describe('knows its shape with all elements', () => {
+    it('for CAT x CAT', () => {
+      expect(catXCatCube.shape).toEqual([3, 4]);
+    });
+
+    fit('for MR x CAT', () => {
+      expect(mrXCatCube.shape).toEqual([5, 3, 9]);
+    });
   });
 
   it('reshapes all counts', () => {
@@ -40,8 +53,8 @@ describe('JsCube', () => {
   });
 
   it('indexes valid counts', () => {
-	let actual = catXCatCube.counts;
-	let expected = nj.array([[5, 2], [5, 3]]);
+    let actual = catXCatCube.counts;
+    let expected = nj.array([[5, 2], [5, 3]]);
     expect(actual).toEqual(expected);
   });
 });
@@ -71,6 +84,8 @@ describe('CatXCatMatrix', () => {
 
   it('calculates column proportions', () => {
     let matrix = new jsc.JsCube(cat_x_cat).slices[0];
-    expect(matrix.columnProportions).toEqual(nj.array([[0.5, 0.5], [0.4,0.6]]));
+    expect(matrix.columnProportions).toEqual(
+      nj.array([[0.5, 0.5], [0.4, 0.6]]),
+    );
   });
 });
