@@ -41,7 +41,7 @@ describe('JsCube', () => {
       expect(catXCatCube.shape).toEqual([3, 4]);
     });
 
-    fit('for MR x CAT', () => {
+    it('for MR x CAT', () => {
       expect(mrXCatCube.shape).toEqual([5, 3, 9]);
     });
   });
