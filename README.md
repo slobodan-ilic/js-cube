@@ -7,7 +7,11 @@ This is an attempt to create a light-weight library for manipulating the results
 ## Implementation
 The basic architecture tries to imitate that of the [crunch-cube](https://github.com/Crunch-io/crunch-cube) (the Python package for the same purpose).
 
+## Current State
+- Basic type resolution for CAT (Categorical) and MR (Multiple Response)
+- Basic calculation of column-percentages for CAT x CAT
+
 ## Roadmap
-- Add basic dimension types functionality
-- Add row-, column- and table-wise direction percentage calculation for the common cube types
+- Add basic dimension types functionality (proper resolution for other types, hiding MR_CAT dimensions)
+- Add row-, column- and table-wise direction percentage calculation for the common cube types (univariate CAT, MR, bivariate CAT x CAT, CAT x MR, MR x CAT, MR x MR)
 - Try to come up with a POC, and see if it's feasible to use in production
