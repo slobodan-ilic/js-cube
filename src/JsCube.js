@@ -1,12 +1,6 @@
 var nj = require('numjs');
 
-const dimensionTypes = Object.freeze({
-  CAT: "CAT",
-  MR: "MR",
-  MR_CAT: "MR_CAT"
-});
-
-const dt = dimensionTypes
+const dt = require('./dimensionTypes.constants')
 
 class Dimension {
   constructor(dimDict) {
@@ -47,7 +41,6 @@ class Dimension {
     let typeClass = dimDict.type.class;
 
     if (typeClass === 'categorical') {
-
       return this.resolveCategorical;
     }
 
@@ -156,6 +149,6 @@ class CatXCatMatrix {
 
 module.exports = {
   JsCube: JsCube,
-  dimensionTypes: dimensionTypes,
+  dimensionTypes: dt,
   Dimension: Dimension,
 };
