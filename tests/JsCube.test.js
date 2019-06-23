@@ -1,5 +1,5 @@
 const nj = require('numjs');
-const jsc = require('../src/JsCube');
+const jsc = require('../src/cube');
 const dt = jsc.dimensionTypes;
 const cat_x_cat = require('./fixtures/cat-x-cat.json');
 const mr_x_cat = require('./fixtures/mr-x-cat-hs.json');
