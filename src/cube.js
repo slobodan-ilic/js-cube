@@ -1,51 +1,9 @@
 var nj = require('numjs');
 
-const dimensionTypes = Object.freeze({
-  CAT: 0,
-  MR: 1,
-});
+const Dimension = require('./dimension')
+const dt = require('./dimensionTypes.constants')
 
-class Dimension {
-  constructor(dimDict) {
-    this.dimDict = dimDict;
-  }
 
-  get type() {
-    return this.getType();
-  }
-
-  get elements() {
-    if (this.type === dimensionTypes.CAT) {
-      return this.dimDict.type.categories;
-    }
-    if (this.type === dimensionTypes.MR) {
-      return this.dimDict.type.elements;
-    }
-  }
-
-  get validIndices() {
-    return this.elements
-      .map((e, i) => (!e.missing ? i : -1))
-      .filter(i => i !== -1);
-  }
-
-  getType() {
-    let dimDict = this.dimDict;
-    let typeClass = dimDict.type.class;
-
-    if (typeClass === 'categorical') {
-      return dimensionTypes.CAT;
-    }
-
-    if (typeClass === 'enum') {
-      let subclass = dimDict.type.subtype.class;
-      if (subclass === 'variable') {
-        // TODO: Add proper array type resolution here
-        return dimensionTypes.MR;
-      }
-    }
-  }
-}
 
 class JsCube {
   constructor(response) {
@@ -72,8 +30,12 @@ class JsCube {
     return this.result.dimensions.map(dimDict => new Dimension(dimDict));
   }
 
-  get dimensionTypes() {
+  get allDimensionTypes() {
     return this.dimensions.map(dim => dim.type);
+  }
+
+  get dimensionTypes() {
+    return this.allDimensionTypes.filter(t => t !== dt.MR_CAT)
   }
 
   get slices() {
@@ -138,6 +100,5 @@ class CatXCatMatrix {
 
 module.exports = {
   JsCube: JsCube,
-  dimensionTypes: dimensionTypes,
-  Dimension: Dimension,
+  dimensionTypes: dt,
 };
