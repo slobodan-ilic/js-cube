@@ -101,4 +101,11 @@ describe('MrXCatMatrix', () => {
     let matrix = new jsc.JsCube(mr_x_cat).slices[0];
     expect(matrix.columnMargin).toEqual(expected);
   });
+
+  it('calculates row margin', () => {
+    const expected = nj.array([26, 76, 118, 369, 385]);
+
+    let matrix = new jsc.JsCube(mr_x_cat).slices[0];
+    expect(matrix.rowMargin).toEqual(expected);
+  });
 });
