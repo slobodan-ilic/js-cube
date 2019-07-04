@@ -3,7 +3,6 @@ const jsc = require('../src/cube');
 const dt = jsc.dimensionTypes;
 const cat_x_cat = require('./fixtures/cat-x-cat.json');
 const mr_x_cat = require('./fixtures/mr-x-cat-hs.json');
-const DT = jsc.dimensionTypes;
 const catXCatCube = new jsc.JsCube(cat_x_cat);
 const mrXCatCube = new jsc.JsCube(mr_x_cat);
 
@@ -40,7 +39,7 @@ describe('JsCube', () => {
     it('to MR x MR_CAT x CAT', () => {
       expect(mrXCatCube.allDimensionTypes).toEqual([dt.MR, dt.MR_CAT, dt.CAT]);
     });
-  })
+  });
 
   describe('knows its shape with all elements', () => {
     it('for CAT x CAT', () => {
@@ -54,7 +53,7 @@ describe('JsCube', () => {
 
   it('reshapes all counts', () => {
     expect(catXCatCube.allCounts).toEqual(
-      nj.array([[5, 3, 2, 0], [5, 2, 3, 0], [0, 0, 0, 0]]),
+      nj.array([[5, 3, 2, 0], [5, 2, 3, 0], [0, 0, 0, 0]])
     );
   });
 
@@ -66,6 +65,11 @@ describe('JsCube', () => {
 });
 
 describe('CatXCatMatrix', () => {
+  it('has correct dimension types', () => {
+    let cube = new jsc.JsCube(cat_x_cat);
+    expect(cube.dimensionTypes).toEqual([dt.CAT, dt.CAT]);
+  });
+
   it('calculates column margin', () => {
     let matrix = new jsc.JsCube(cat_x_cat).slices[0];
     expect(matrix.columnMargin).toEqual(nj.array([10, 5]));
@@ -79,7 +83,22 @@ describe('CatXCatMatrix', () => {
   it('calculates column proportions', () => {
     let matrix = new jsc.JsCube(cat_x_cat).slices[0];
     expect(matrix.columnProportions).toEqual(
-      nj.array([[0.5, 0.5], [0.4, 0.6]]),
+      nj.array([[0.5, 0.5], [0.4, 0.6]])
     );
+  });
+});
+
+describe('MrXCatMatrix', () => {
+  it('calculates column margin', () => {
+    const expected = nj.array([
+      [15, 24, 0, 57, 69, 0],
+      [15, 34, 0, 75, 86, 0],
+      [13, 37, 0, 81, 111, 0],
+      [20, 50, 0, 159, 221, 0],
+      [32, 69, 0, 167, 208, 0],
+    ]);
+
+    let matrix = new jsc.JsCube(mr_x_cat).slices[0];
+    expect(matrix.columnMargin).toEqual(expected);
   });
 });
