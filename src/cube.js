@@ -101,6 +101,8 @@ class MultipleResponseVector extends CategoricalVector {
   }
 }
 
+class CatXMrVector extends CategoricalVector {}
+
 class CatXCatMatrix {
   constructor(dimensions, counts) {
     this.dimensions = dimensions;
@@ -136,10 +138,18 @@ class MrXCatMatrix extends CatXCatMatrix {
     return columnCounts.map(counts => new MultipleResponseVector(counts));
   }
 
+  get rows() {
+    let rowCounts = this.counts.tolist();
+    return rowCounts.map(counts => new CatXMrVector(counts[0]));
+  }
   get columnMargin() {
     return nj.array(
       nj.stack(this.columns.map(column => column.margin)).T.tolist()
     );
+  }
+
+  get rowMargin() {
+    return nj.array(this.rows.map(row => row.margin));
   }
 }
 
