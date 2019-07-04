@@ -1,4 +1,4 @@
-const dt = require('./dimensionTypes.constants')
+const dt = require('./dimensionTypes.constants');
 
 class Dimension {
   constructor(dimDict) {
@@ -38,13 +38,13 @@ class Dimension {
     let dimDict = this.dimDict;
     let typeClass = dimDict.type.class;
 
-    if (typeClass === "categorical") {
+    if (typeClass === 'categorical') {
       return this.resolveCategorical;
     }
 
-    if (typeClass === "enum") {
+    if (typeClass === 'enum') {
       let subclass = dimDict.type.subtype.class;
-      if (subclass === "variable") {
+      if (subclass === 'variable') {
         // TODO: Add proper array type resolution here
         return dt.MR;
       }
@@ -52,4 +52,4 @@ class Dimension {
   }
 }
 
-module.exports = Dimension
+module.exports = Dimension;

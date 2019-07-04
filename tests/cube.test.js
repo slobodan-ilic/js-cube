@@ -65,6 +65,11 @@ describe('JsCube', () => {
 });
 
 describe('CatXCatMatrix', () => {
+  it('has correct dimension types', () => {
+    let cube = new jsc.JsCube(cat_x_cat);
+    expect(cube.dimensionTypes).toEqual([dt.CAT, dt.CAT]);
+  });
+
   it('calculates column margin', () => {
     let matrix = new jsc.JsCube(cat_x_cat).slices[0];
     expect(matrix.columnMargin).toEqual(nj.array([10, 5]));
@@ -80,5 +85,20 @@ describe('CatXCatMatrix', () => {
     expect(matrix.columnProportions).toEqual(
       nj.array([[0.5, 0.5], [0.4, 0.6]])
     );
+  });
+});
+
+describe('MrXCatMatrix', () => {
+  it('calculates column margin', () => {
+    const expected = nj.array([
+      [15, 24, 0, 57, 69, 0],
+      [15, 34, 0, 75, 86, 0],
+      [13, 37, 0, 81, 111, 0],
+      [20, 50, 0, 159, 221, 0],
+      [32, 69, 0, 167, 208, 0],
+    ]);
+
+    let matrix = new jsc.JsCube(mr_x_cat).slices[0];
+    expect(matrix.columnMargin).toEqual(expected);
   });
 });

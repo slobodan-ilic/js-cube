@@ -1,9 +1,9 @@
 var nj = require('numjs');
 
-const Dimension = require('./dimension')
-const dt = require('./dimensionTypes.constants')
+const Dimension = require('./dimension');
+const dt = require('./dimensionTypes.constants');
 
-
+const _ = require('lodash');
 
 class JsCube {
   constructor(response) {
@@ -14,16 +14,32 @@ class JsCube {
     return nj.array(this.result.counts).reshape(this.shape);
   }
 
+  get3dValids(arr3d, valids) {
+    return arr3d
+      .map(slc2d =>
+        slc2d
+          .map(slc1d => slc1d.filter((_, k) => valids[2].includes(k)))
+          .filter((_, j) => valids[1].includes(j))
+      )
+      .filter((_, i) => valids[0].includes(i));
+  }
+
+  get2dValids(arr2d, valids) {
+    return arr2d
+      .map(slc1d => slc1d.filter((_, k) => valids[1].includes(k)))
+      .filter((_, j) => valids[0].includes(j));
+  }
+
   get counts() {
     let validIndices = this.dimensions.map(d => d.validIndices);
-    let counts = this.allCounts;
+    let counts = this.allCounts.tolist();
 
-    // Eliminate missing columns
-    counts = nj.stack(validIndices[1].map(i => counts.T.pick(i, null)));
-    // Eliminate missing rows
-    counts = nj.stack(validIndices[0].map(i => counts.T.pick(i, null)));
-
-    return counts;
+    if (validIndices.length === 3) {
+      return nj.array(this.get3dValids(counts, validIndices));
+    }
+    if (validIndices.length === 2) {
+      return nj.array(this.get2dValids(counts, validIndices));
+    }
   }
 
   get dimensions() {
@@ -35,7 +51,8 @@ class JsCube {
   }
 
   get dimensionTypes() {
-    return this.allDimensionTypes.filter(t => t !== dt.MR_CAT)
+    var dtypes = this.allDimensionTypes.filter(t => t !== dt.MR_CAT);
+    return dtypes;
   }
 
   get slices() {
@@ -47,10 +64,11 @@ class JsCube {
   }
 
   getSlices() {
-    if (this.dimensions.length === 2) {
+    const dimensionTypes = this.dimensionTypes;
+    if (_.isEqual(dimensionTypes, [dt.CAT, dt.CAT])) {
       return [new CatXCatMatrix(this.dimensions, this.counts)];
-    } else {
-      // TODO: Index correct counts
+    } else if (_.isEqual(dimensionTypes, [dt.MR, dt.CAT])) {
+      return [new MrXCatMatrix(this.dimensions, this.counts)];
     }
   }
 }
@@ -66,6 +84,20 @@ class CategoricalVector {
 
   get proportions() {
     return nj.stack(this.counts.map(count => count / this.margin));
+  }
+}
+
+class MultipleResponseVector extends CategoricalVector {
+  get margin() {
+    return _.zip(this.selected, this.other).map(counts => _.sum(counts));
+  }
+
+  get selected() {
+    return this.counts[0];
+  }
+
+  get other() {
+    return this.counts[1];
   }
 }
 
@@ -95,6 +127,19 @@ class CatXCatMatrix {
   get columns() {
     let columnCounts = this.counts.T.tolist();
     return columnCounts.map(counts => new CategoricalVector(counts));
+  }
+}
+
+class MrXCatMatrix extends CatXCatMatrix {
+  get columns() {
+    let columnCounts = this.counts.T.tolist();
+    return columnCounts.map(counts => new MultipleResponseVector(counts));
+  }
+
+  get columnMargin() {
+    return nj.array(
+      nj.stack(this.columns.map(column => column.margin)).T.tolist()
+    );
   }
 }
 

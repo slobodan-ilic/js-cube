@@ -3,7 +3,7 @@ const mr_x_cat = require('./fixtures/mr-x-cat-hs.json');
 const DT = require('../src/dimensionTypes.constants');
 const Dimension = require('../src/dimension');
 
-describe('Dimension', () => {
+describe('First CAT x CAT Dimension', () => {
   it('resolves to CAT type', () => {
     let dimension = new Dimension(cat_x_cat.result.dimensions[0]);
     expect(dimension.type).toEqual(DT.CAT);
@@ -22,5 +22,12 @@ describe('Dimension', () => {
   it('knows its valid indexes', () => {
     let dimension = new Dimension(cat_x_cat.result.dimensions[0]);
     expect(dimension.validIndices).toEqual([0, 1]);
+  });
+});
+
+describe('Second CAT x CAT Dimension', () => {
+  it('resolves to CAT type', () => {
+    let dimension = new Dimension(cat_x_cat.result.dimensions[1]);
+    expect(dimension.type).toEqual(DT.CAT);
   });
 });
